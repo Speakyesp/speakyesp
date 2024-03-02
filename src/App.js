@@ -5,16 +5,20 @@ import { getDatabase, ref, push, serverTimestamp, update, remove } from "firebas
 import chatIcon from './chatus.png'; // Import your chat icon image
 
 class ChatApp extends React.Component {
-    state = {
-        user: null,
-        messages: [],
-        newMessage: '',
-        loading: false,
-        email: '',
-        password: '',
-        selectedMessageId: null, // Store the ID of the selected message
-        contextMenuVisible: false // Flag to control the visibility of the context menu
-    };
+    constructor(props) {
+        super(props);
+        this.state = {
+            user: null,
+            messages: [],
+            newMessage: '',
+            loading: false,
+            email: '',
+            password: '',
+            selectedMessageId: null,
+            contextMenuVisible: false,
+        };
+        this.chatContainerRef = React.createRef();
+    }
 
     componentDidMount() {
         firebase.auth().onAuthStateChanged(user => {
@@ -41,9 +45,25 @@ class ChatApp extends React.Component {
                         senderEmail: senderEmail
                     };
                 }));
-                this.setState({ messages: messagesWithUsers });
+                this.setState({ messages: messagesWithUsers }, () => {
+                    // Scroll to bottom only if user is already at the bottom
+                    if (this.isScrolledToBottom()) {
+                        this.scrollToBottom();
+                    }
+                });
             }
         });
+    };
+
+    scrollToBottom = () => {
+        if (this.chatContainerRef.current) {
+            this.chatContainerRef.current.scrollTop = this.chatContainerRef.current.scrollHeight;
+        }
+    };
+
+    isScrolledToBottom = () => {
+        const chatContainer = this.chatContainerRef.current;
+        return chatContainer.scrollHeight - chatContainer.clientHeight <= chatContainer.scrollTop + 1;
     };
 
     handleChange = (e) => {
@@ -143,80 +163,90 @@ class ChatApp extends React.Component {
         });
     };
 
-    handleEmojiClick = (emoji) => {
-        this.setState(prevState => ({
-            newMessage: prevState.newMessage + emoji
-        }));
+    handleLikeMessage = () => {
+        const { selectedMessageId, user } = this.state;
+        if (!user || !selectedMessageId) return;
+
+        const db = getDatabase();
+        const messageRef = ref(db, `messages/${selectedMessageId}/likes`);
+        push(messageRef, {
+            userId: user.uid,
+            timestamp: serverTimestamp()
+        }).then(() => {
+            console.log('Message liked successfully');
+            this.setState({ selectedMessageId: null }); // Reset selected message ID after liking
+        }).catch(error => {
+            console.error('Error liking message:', error);
+        });
     };
 
     render() {
-      const { messages, newMessage, loading, user, email, password, contextMenuVisible } = this.state;
-  
-      return (
-          <div className="app-container container">
-              <nav className="navbar">
-                  <img src={chatIcon} alt="Chat Icon" className="chat-icon" style={{ width: '50px', height: '50px' }} />
-                  {user && (
-                      <button className="logout-button" onClick={this.handleLogout}>Logout</button>
-                  )}
-              </nav>
-              <div className="chat-container">
-                  {user && (
-                      <div className="message-container">
-                          {messages.map((message, index) => (
-                              <div
-                                  key={index}
-                                  className={`message-bubble ${message.userId === user?.uid ? 'your-message' : 'other-user-message'}`}
-                                  onContextMenu={e => this.handleContextMenu(e, message.id)} // Pass the message id to the context menu handler
-                              >
-                                  <span className="message-sender">{message.userId === user?.uid ? 'You' : message.senderEmail}: </span>
-                                  {message.text}
-                                  <span className="message-time">{new Date(message.timestamp).toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true })}</span>
-                              </div>
-                          ))}
-                      </div>
-                  )}
-  
-                  {user ? (
-                      <form className="message-input" onSubmit={this.handleSubmit}>
-                          <input
-                              type="text"
-                              placeholder="Type your message..."
-                              value={newMessage}
-                              onChange={this.handleChange}
-                              disabled={loading}
-                          />
-                          <button type="submit" disabled={loading}>Send</button>
-                      </form>
-                  ) : (
-                      <div className="login-form">
-                          <input
-                              type="email"
-                              placeholder="Email"
-                              value={email}
-                              onChange={e => this.setState({ email: e.target.value })}
-                          />
-                          <input
-                              type="password"
-                              placeholder="Password"
-                              value={password}
-                              onChange={e => this.setState({ password: e.target.value })}
-                          />
-                          <button className="login-button" onClick={this.handleEmailLogin}>Login</button>
-                      </div>
-                  )}
-                  {contextMenuVisible && (
-                      <div className="context-menu">
-                          <button className="context-menu-item" onClick={this.handleDeleteMessage}>Delete</button>
-                          <button className="context-menu-item" onClick={() => this.handleEditMessage('New text')}>Edit</button>
-                          <button className="context-menu-item" onClick={() => this.handleEmojiClick('😊')}>😊</button>
-                      </div>
-                  )}
-              </div>
-          </div>
-      );
-  }
-  
+        const { messages, newMessage, loading, user, email, password, contextMenuVisible } = this.state;
+
+        return (
+            <div className="app-container container">
+                <nav className="navbar">
+                    <img src={chatIcon} alt="Chat Icon" className="chat-icon" style={{ width: '50px', height: '50px' }} />
+                    {user && (
+                        <button className="logout-button" onClick={this.handleLogout}>Logout</button>
+                    )}
+                </nav>
+                <div className="chat-container" ref={this.chatContainerRef}>
+                    {user && (
+                        <div className="message-container">
+                            {messages.map((message, index) => (
+                                <div
+                                    key={index}
+                                    className={`message-bubble ${message.userId === user?.uid ? 'your-message' : 'other-user-message'}`}
+                                    onContextMenu={e => this.handleContextMenu(e, message.id)}
+                                >
+                                    <span className="message-sender">{message.userId === user?.uid ? 'You' : message.senderEmail}: </span>
+                                    {message.text}
+                                    <span className="message-time">{new Date(message.timestamp).toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true })}</span>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+
+                    {user ? (
+                        <form className="message-input" onSubmit={this.handleSubmit}>
+                            <input
+                                type="text"
+                                placeholder="Type your message..."
+                                value={newMessage}
+                                onChange={this.handleChange}
+                                disabled={loading}
+                            />
+                            <button type="submit" disabled={loading}>Send</button>
+                        </form>
+                    ) : (
+                        <div className="login-form">
+                            <input
+                                type="email"
+                                placeholder="Email"
+                                value={email}
+                                onChange={e => this.setState({ email: e.target.value })}
+                            />
+                            <input
+                                type="password"
+                                placeholder="Password"
+                                value={password}
+                                onChange={e => this.setState({ password: e.target.value })}
+                            />
+                            <button className="login-button" onClick={this.handleEmailLogin}>Login</button>
+                        </div>
+                    )}
+                    {contextMenuVisible && (
+                        <div className="context-menu">
+                            <button className="context-menu-item" onClick={this.handleDeleteMessage}>Delete</button>
+                            <button className="context-menu-item" onClick={() => this.handleEditMessage('New text')}>Edit</button>
+                        </div>
+                    )}
+                </div>
+             
+            </div>
+        );
+    }
 }
 
 export default ChatApp;

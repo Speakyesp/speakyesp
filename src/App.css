@@ -1,3 +1,11 @@
+/* Global Styles */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  padding-top: 60px; /* Adjust based on navbar height */
+}
+
 /* App Container */
 .app-container {
   width: 100%;
@@ -6,20 +14,51 @@
   padding: 20px;
 }
 
+/* Navbar */
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 20px;
+  background-color: #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-title {
+  margin: 0;
+  font-size: 1.2em;
+  color: #333;
+}
+
+.logout-button {
+  background-color: transparent;
+  border: none;
+  color: #ed4956; /* Instagram red */
+  cursor: pointer;
+}
+
 /* Login Container */
 .login-container {
+  position: absolute;
+  top: 60px; /* Adjust based on navbar height */
+  left: 0;
+  right: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 100%;
+  height: calc(100vh - 60px); /* Subtract navbar height from viewport height */
 }
 
 .login-form {
-  align-items: right;
+  align-items: center; /* Center the form items horizontally */
   display: flex;
   flex-direction: column;
-  /* align-items: center; */
   gap: 10px;
   width: 300px;
 }
@@ -36,24 +75,20 @@
   padding: 12px;
   border: none;
   border-radius: 4px;
-  background-color: #5d55ff; /* Instagram Blue */
+  background-color: #3897f0; /* Instagram blue */
   color: #fff;
   cursor: pointer;
 }
 
 .login-button:hover {
-  background-color:#5d55ff; /* Darker Blue */
+  background-color: #2a5eb8; /* Darker blue */
 }
-
-/* @media (max-width: 768px) {
-  .login-form {
-    width: 90%;
-  }
-} */
 
 /* Chat Container */
 .chat-container {
-  background-color: #f0f0f0;
+  padding-top: 60px; /* Adjust based on navbar height */
+  padding-bottom: 100px; /* Adjust based on message input height */
+  background-color: #fafafa;
   padding: 20px;
   border-radius: 10px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -76,7 +111,7 @@
 /* Your Message */
 .message-bubble.your-message {
   align-self: flex-end;
-  background-color: #5d55ff; /* Instagram Blue */
+  background-color: #3897f0; /* Instagram blue */
   color: #fff;
 }
 
@@ -114,8 +149,13 @@
 
 /* Message Input Form */
 .message-input {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000; /* Ensure it's above other content */
   display: flex;
-  margin-top: 20px;
+  margin: 20px;
 }
 
 .message-input input[type="text"] {
@@ -124,81 +164,40 @@
   border: 1px solid #dbdbdb;
   border-radius: 4px;
   font-size: 1em;
-  margin-right: 10px; /* Add space between input and button */
 }
 
 .message-input button {
   padding: 12px 20px;
   border: none;
   border-radius: 4px;
-  background-color: #000000; /* Instagram Blue */
+  background-color: #3897f0; /* Instagram blue */
   color: #fff;
   cursor: pointer;
 }
 
 .message-input button:hover {
-  background-color: #2b2b2b; /* Darker Blue */
+  background-color: #2a5eb8; /* Darker blue */
 }
-/* For screens smaller than 768px (Mobile view) */
+
+/* For screens smaller than 400px (Mobile view) */
 @media (max-width: 400px) {
-  /* Body or a parent container */
-  body {
-    overflow-x: hidden;
-  }
-
-  /* Other adjustments as before */
-  /* Login form */
-  .login-form {
-    width: 40%;
-  }
-
-  /* Chat Container */
-  .chat-container {
-    padding: 10px;
-  }
-
-  /* Message Bubble */
-  .message-bubble {
-    max-width: 40%;
-  }
-
-  /* Individual Message */
-  .message {
-    max-width: 40%;
+  /* Navbar */
+  .navbar {
+    padding: 5px;
   }
 
   /* Message Input Form */
   .message-input {
-    flex-direction: column;
-    margin-top: 10px;
+    margin: 10px;
   }
 
   .message-input input[type="text"] {
-    margin-right: 0;
-    margin-bottom: 10px; /* Add space between input and button */
+    margin-bottom: 0; /* Remove space between input and button */
   }
 
-  .message-input button {
-    margin-right: 0;
+  /* Adjust padding for chat container */
+  .chat-container {
+    padding-top: 50px; /* Adjust as per navbar height */
+    padding-bottom: 80px; /* Adjust as per message input height */
   }
-}
-/* App.css */
-
-.navbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px;
-  background-color: #ffffff;
-}
-
-.navbar-title {
-  margin: 0;
-}
-
-.logout-button {
-  background-color: transparent;
-  border: none;
-  color: red;
-  cursor: pointer;
 }
