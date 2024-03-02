@@ -121,49 +121,47 @@ class ChatApp extends React.Component {
                 imagePreviewURL: reader.result // Store the image preview URL in state
             });
         };
-        reader.readAsDataURL(file); // Read the file as a Data URL
-
-        // Reset imageFile state if no file is selected
-        if (!file) {
-            this.setState({
-                imageFile: null,
-                imagePreviewURL: ''
-            });
+        // Read the file as a Data URL
+        if (file) {
+            reader.readAsDataURL(file);
         }
     };
 
     handleSubmit = async (e) => {
         e.preventDefault();
         const { newMessage, user, imageFile, repliedMessage } = this.state;
-    
+
         if (!user) {
             return;
         }
-    
+
         // If both text message and image are empty, return
         if (newMessage.trim() === '' && !imageFile) {
             return;
         }
-    
+
         this.setState({ loading: true });
-    
+
         try {
             if (imageFile) {
                 // Upload the image
                 const imageURL = await this.uploadImage(imageFile);
                 // Send message with image URL
                 await this.sendMessageWithImage(newMessage, user, imageURL, repliedMessage);
+                // Clear image preview after sending
+                this.setState({
+                    imageFile: null,
+                    imagePreviewURL: ''
+                });
             } else {
                 // Send text message only
                 await this.sendMessage(newMessage, user, repliedMessage);
             }
-    
+
             // Reset state after sending message
             this.setState({
                 newMessage: '',
                 loading: false,
-                imageFile: null, // Reset imageFile state after sending message
-                imagePreviewURL: '', // Reset imagePreviewURL state after sending message
                 repliedMessage: null, // Clear replied message after sending
             });
         } catch (error) {
@@ -174,24 +172,23 @@ class ChatApp extends React.Component {
         }
     };
 
-  uploadImage = (file) => {
-    // Upload the image file to Firebase Storage
-    return new Promise((resolve, reject) => {
-        const storageRef = firebase.storage();
-        const imageRef = storageRef.child(`images/${file.name}`);
-        imageRef.put(file)
-            .then(snapshot => {
-                return snapshot.ref.getDownloadURL();
-            })
-            .then(downloadURL => {
-                resolve(downloadURL);
-            })
-            .catch(error => {
-                reject(error);
-            });
-    });
-};
-
+    uploadImage = (file) => {
+        // Upload the image file to Firebase Storage
+        return new Promise((resolve, reject) => {
+            const storageRef = firebase.storage().ref();
+            const imageRef = storageRef.child(`images/${file.name}`);
+            imageRef.put(file)
+                .then(snapshot => {
+                    return snapshot.ref.getDownloadURL();
+                })
+                .then(downloadURL => {
+                    resolve(downloadURL);
+                })
+                .catch(error => {
+                    reject(error);
+                });
+        });
+    };
 
     sendMessageWithImage = (newMessage, user, imageURL, repliedMessage) => {
         const db = getDatabase();
@@ -210,8 +207,6 @@ class ChatApp extends React.Component {
                 this.setState({
                     newMessage: '',
                     loading: false,
-                    imageFile: null, // Reset imageFile state after sending message
-                    imagePreviewURL: '', // Reset imagePreviewURL state after sending message
                     repliedMessage: null, // Clear replied message after sending
                 });
             })
