@@ -1,0 +1,204 @@
+/* App Container */
+.app-container {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* Login Container */
+.login-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.login-form {
+  align-items: right;
+  display: flex;
+  flex-direction: column;
+  /* align-items: center; */
+  gap: 10px;
+  width: 300px;
+}
+
+.login-form input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #dbdbdb;
+  border-radius: 4px;
+}
+
+.login-button {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 4px;
+  background-color: #5d55ff; /* Instagram Blue */
+  color: #fff;
+  cursor: pointer;
+}
+
+.login-button:hover {
+  background-color:#5d55ff; /* Darker Blue */
+}
+
+/* @media (max-width: 768px) {
+  .login-form {
+    width: 90%;
+  }
+} */
+
+/* Chat Container */
+.chat-container {
+  background-color: #f0f0f0;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Message Container */
+.message-container {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Message Bubble */
+.message-bubble {
+  max-width: 70%;
+  margin-bottom: 10px;
+  padding: 10px;
+  border-radius: 15px;
+}
+
+/* Your Message */
+.message-bubble.your-message {
+  align-self: flex-end;
+  background-color: #5d55ff; /* Instagram Blue */
+  color: #fff;
+}
+
+/* Other User's Message */
+.message-bubble.other-user-message {
+  align-self: flex-start;
+  background-color: #fff;
+  color: #333;
+}
+
+/* Individual Message */
+.message {
+  margin-bottom: 10px;
+  padding: 10px;
+  border-radius: 15px;
+  max-width: 70%;
+}
+
+/* Sender Name */
+.message-sender {
+  font-weight: bold;
+  margin-right: 5px;
+}
+
+/* Message Timestamp */
+.message-time {
+  font-size: 0.8em;
+  margin-left: 10px;
+}
+
+/* Message Text */
+.message-text {
+  color: #333;
+}
+
+/* Message Input Form */
+.message-input {
+  display: flex;
+  margin-top: 20px;
+}
+
+.message-input input[type="text"] {
+  flex: 1;
+  padding: 12px;
+  border: 1px solid #dbdbdb;
+  border-radius: 4px;
+  font-size: 1em;
+  margin-right: 10px; /* Add space between input and button */
+}
+
+.message-input button {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 4px;
+  background-color: #000000; /* Instagram Blue */
+  color: #fff;
+  cursor: pointer;
+}
+
+.message-input button:hover {
+  background-color: #2b2b2b; /* Darker Blue */
+}
+/* For screens smaller than 768px (Mobile view) */
+@media (max-width: 400px) {
+  /* Body or a parent container */
+  body {
+    overflow-x: hidden;
+  }
+
+  /* Other adjustments as before */
+  /* Login form */
+  .login-form {
+    width: 40%;
+  }
+
+  /* Chat Container */
+  .chat-container {
+    padding: 10px;
+  }
+
+  /* Message Bubble */
+  .message-bubble {
+    max-width: 40%;
+  }
+
+  /* Individual Message */
+  .message {
+    max-width: 40%;
+  }
+
+  /* Message Input Form */
+  .message-input {
+    flex-direction: column;
+    margin-top: 10px;
+  }
+
+  .message-input input[type="text"] {
+    margin-right: 0;
+    margin-bottom: 10px; /* Add space between input and button */
+  }
+
+  .message-input button {
+    margin-right: 0;
+  }
+}
+/* App.css */
+
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px;
+  background-color: #ffffff;
+}
+
+.navbar-title {
+  margin: 0;
+}
+
+.logout-button {
+  background-color: transparent;
+  border: none;
+  color: red;
+  cursor: pointer;
+}
