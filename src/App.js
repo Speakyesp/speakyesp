@@ -33,7 +33,7 @@ class ChatApp extends React.Component {
 
     fetchMessages = () => {
         const messagesRef = firebase.database().ref('messages');
-        messagesRef.on('value', async snapshot => {
+        messagesRef.orderByChild('timestamp').on('value', async snapshot => {
             const messages = snapshot.val();
             if (messages) {
                 const messagesWithUsers = await Promise.all(Object.values(messages).map(async message => {
@@ -54,6 +54,7 @@ class ChatApp extends React.Component {
             }
         });
     };
+    
 
     scrollToBottom = () => {
         if (this.chatContainerRef.current) {
@@ -179,6 +180,9 @@ class ChatApp extends React.Component {
             console.error('Error liking message:', error);
         });
     };
+    handleScrollToEnd = () => {
+        this.scrollToBottom();
+    };
 
     render() {
         const { messages, newMessage, loading, user, email, password, contextMenuVisible } = this.state;
@@ -194,7 +198,7 @@ class ChatApp extends React.Component {
                 <div className="chat-container" ref={this.chatContainerRef}>
                     {user && (
                         <div className="message-container">
-                            {messages.map((message, index) => (
+                             {messages.slice(0).reverse().map((message, index)=> (
                                 <div
                                     key={index}
                                     className={`message-bubble ${message.userId === user?.uid ? 'your-message' : 'other-user-message'}`}
@@ -241,7 +245,9 @@ class ChatApp extends React.Component {
                             <button className="context-menu-item" onClick={this.handleDeleteMessage}>Delete</button>
                             <button className="context-menu-item" onClick={() => this.handleEditMessage('New text')}>Edit</button>
                         </div>
+                        
                     )}
+                     <button className="scroll-to-end-button" onClick={this.handleScrollToEnd}>Scroll to End</button>
                 </div>
              
             </div>
