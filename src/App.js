@@ -274,12 +274,7 @@ class ChatApp extends React.Component {
                             <button className="login-button" onClick={this.handleEmailLogin}>Login</button>
                         </div>
                     )}
-                    {contextMenuVisible && (
-                        <div className="context-menu">
-                            <button className="context-menu-item" onClick={this.handleDeleteMessage}>Delete</button>
-                            <button className="context-menu-item" onClick={() => this.handleEditMessage('New text')}>Edit</button>
-                        </div>
-                    )}
+                
                 </div>
                 {/* <button className="scroll-to-end-button" onClick={this.handleScrollToEnd}>Scroll to End</button> */}
             </div>
