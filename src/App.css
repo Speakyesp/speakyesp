@@ -75,7 +75,7 @@ body {
   padding: 12px;
   border: none;
   border-radius: 4px;
-  background-color: #3897f0; /* Instagram blue */
+  background-color: #2a5eb8;  /* Instagram blue */
   color: #fff;
   cursor: pointer;
 }
@@ -179,57 +179,293 @@ body {
   background-color: #2a5eb8; /* Darker blue */
 }
 
-/* For screens smaller than 400px (Mobile view) */
-@media (max-width: 400px) {
-  /* Navbar */
-  .navbar {
-    padding: 5px;
-  }
-
-  /* Message Input Form */
-  .message-input {
-    margin: 10px;
-  }
-
-  .message-input input[type="text"] {
-    margin-bottom: 0; /* Remove space between input and button */
-  }
-
-  /* Adjust padding for chat container */
-  .chat-container {
-    padding-top: 50px; /* Adjust as per navbar height */
-    padding-bottom: 80px; /* Adjust as per message input height */
-  }
-}
-/* For screens smaller than 400px (Mobile view) */
-@media (max-width: 400px) {
-  /* Navbar */
-  .navbar {
-    padding: 5px;
-  }
-
-  /* Message Input Form */
-  .message-input {
-    margin: 10px;
-  }
-
-  .message-input input[type="text"] {
-    margin-bottom: 0; /* Remove space between input and button */
-  }
-
-  /* Adjust padding for chat container */
-  .chat-container {
-    padding-top: 50px; /* Adjust as per navbar height */
-    padding-bottom: 80px; /* Adjust as per message input height */
-  }
-
-  /* Empty Space */
-  .empty-space {
-    height: calc(100vh - 210px); /* Adjust based on navbar and message input height */
-  }
-}
+/* Typing Indicator */
 .typing-indicator {
   color: #999; /* Color of the typing indicator */
   font-size: 12px; /* Font size of the typing indicator */
-  margin-top: -46px; /* Margin at the top of the typing indicator */
+  margin-top: -100px; /* Margin at the top of the typing indicator */
+}
+
+/* For screens smaller than 400px (Mobile view) */
+@media (max-width: 400px) {
+  /* Navbar */
+  .navbar {
+    padding: 5px;
+  }
+
+  /* Message Input Form */
+  .message-input {
+    margin: 10px;
+  }
+
+  .message-input input[type="text"] {
+    margin-bottom: 0; /* Remove space between input and button */
+  }
+
+  /* Adjust padding for chat container */
+  .chat-container {
+    padding-top: 50px; /* Adjust as per navbar height */
+    padding-bottom: 80px; /* Adjust as per message input height */
+  }
+}
+/* Image Container */
+.image-container {
+  max-width: 300px; /* Maximum width of the image container */
+  max-height: 300px; /* Maximum height of the image container */
+  overflow: hidden; /* Hide overflow if image exceeds container size */
+}
+
+/* Image */
+.image-container img {
+  width: 100%; /* Ensure image fills the container width */
+  height: auto; /* Maintain aspect ratio */
+}
+/* File Input Button */
+.message-input input[type="file"] {
+  display: none; /* Hide the default file input */
+}
+
+.upload-button {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 4px;
+  background-color: #2a5eb8; /* Instagram blue */
+  color: #fff;
+  cursor: pointer;
+  display: inline-block;
+}
+
+.upload-button:hover {
+  background-color: #1e4b8f; /* Darker blue on hover */
+}
+.image-preview {
+  margin-top: 10px; /* Adjust margin as needed */
+}
+
+.image-preview img {
+  max-width: 100%; /* Ensure the image fits within its container */
+  height: auto; /* Maintain aspect ratio */
+  border: 1px solid #ccc; /* Add border for clarity */
+  border-radius: 5px; /* Add border radius for rounded corners */
+}
+/* Image Container */
+.image-container {
+  max-width: 300px; /* Maximum width of the image container */
+  max-height: 300px; /* Maximum height of the image container */
+  overflow: hidden; /* Hide overflow if image exceeds container size */
+}
+
+/* Image */
+.image-container img {
+  width: 100%; /* Ensure image fills the container width */
+  height: auto; /* Maintain aspect ratio */
+}
+
+/* File Input Button */
+.message-input input[type="file"] {
+  display: none; /* Hide the default file input */
+}
+
+.upload-button {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 4px;
+  background-color: #2a5eb8; /* Instagram blue */
+  color: #fff;
+  cursor: pointer;
+  display: inline-block;
+}
+
+.upload-button:hover {
+  background-color: #1e4b8f; /* Darker blue on hover */
+}
+
+/* Image Preview */
+.image-preview {
+  margin-top: 10px; /* Adjust margin as needed */
+}
+
+.image-preview img {
+  max-width: 100%; /* Ensure the image fits within its container */
+  height: auto; /* Maintain aspect ratio */
+  border: 1px solid #ccc; /* Add border for clarity */
+  border-radius: 5px; /* Add border radius for rounded corners */
+}
+/* Modal */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.9); /* Semi-transparent black background */
+}
+
+/* Modal Content */
+.modal-content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  max-width: 90%;
+  max-height: 90%;
+}
+
+/* Close Button */
+.close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  color: #fff;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.close:hover {
+  color: #ccc;
+}
+/* Message Options Container */
+.message-options {
+  display: none; /* Initially hide the delete button */
+}
+
+/* Show the delete button when hovering over the message */
+.message-bubble:hover .message-options {
+  display: block;
+}
+
+/* Modal Content (image) */
+.modal-content img {
+  width: 100%;
+  height: auto;
+}
+/* Delete Button */
+/* Delete Button */
+.delete-button {
+  background-color: #ed4956; /* Instagram red */
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 12px;
+  margin-left: 5px;
+  cursor: pointer;
+}
+
+.delete-button:hover {
+  background-color: #c9302c; /* Darker red on hover */
+}
+
+
+/* Show the delete button when hovering over the message */
+.message-bubble:hover .delete-button {
+  display: block;
+}
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInFromTop {
+  from {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideInFromRight {
+  from {
+    transform: translateX(50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideInFromLeft {
+  from {
+    transform: translateX(-50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Additional Styles */
+
+/* Navbar */
+.navbar {
+  /* background-color: #4CAF50; Green */
+  animation: slideInFromTop 0.5s ease;
+}
+
+.logout-button {
+  color: #000000; /* White */
+  transition: background-color 0.3s ease;
+}
+
+.logout-button:hover {
+  background-color: #e1e1e1; /* Red */
+  border-radius: 2PX;
+}
+
+/* Your Message */
+.message-bubble.your-message {
+  background-color: #2196F3; /* Blue */
+}
+
+/* Other User's Message */
+.message-bubble.other-user-message {
+  background-color: #e2e2e2; /* Red */
+}
+
+/* Message Input Form */
+.message-input {
+  animation: slideInFromBottom 0.5s ease;
+}
+
+.message-input input[type="text"] {
+  background-color: #f2f2f2; /* Light gray */
+  transition: border-color 0.3s ease;
+}
+
+.message-input input[type="text"]:focus {
+  border-color: #a3c0a4; /* Green */
+}
+
+.message-input button {
+  background-color: #008CBA; /* Dark blue */
+  transition: background-color 0.3s ease;
+}
+
+.message-input button:hover {
+  background-color: #005A8C; /* Darker blue */
+}
+
+/* Typing Indicator */
+.typing-indicator {
+  color: #f44336; /* Red */
+}
+
+/* Image Preview */
+.image-preview {
+  animation: fadeIn 0.5s ease;
+}
+
+.image-preview img {
+  border-color: #4CAF50; /* Green */
 }
