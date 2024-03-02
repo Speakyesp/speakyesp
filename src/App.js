@@ -215,7 +215,7 @@ class ChatApp extends React.Component {
     };
 
     render() {
-        const { messages, newMessage, loading, user, email, password, contextMenuVisible, otherUsersTyping } = this.state;
+        const { messages, newMessage, loading, user, email, password,  otherUsersTyping } = this.state;
     
         return (
             <div className="app-container container">
