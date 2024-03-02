@@ -201,3 +201,35 @@ body {
     padding-bottom: 80px; /* Adjust as per message input height */
   }
 }
+/* For screens smaller than 400px (Mobile view) */
+@media (max-width: 400px) {
+  /* Navbar */
+  .navbar {
+    padding: 5px;
+  }
+
+  /* Message Input Form */
+  .message-input {
+    margin: 10px;
+  }
+
+  .message-input input[type="text"] {
+    margin-bottom: 0; /* Remove space between input and button */
+  }
+
+  /* Adjust padding for chat container */
+  .chat-container {
+    padding-top: 50px; /* Adjust as per navbar height */
+    padding-bottom: 80px; /* Adjust as per message input height */
+  }
+
+  /* Empty Space */
+  .empty-space {
+    height: calc(100vh - 210px); /* Adjust based on navbar and message input height */
+  }
+}
+.typing-indicator {
+  color: #999; /* Color of the typing indicator */
+  font-size: 12px; /* Font size of the typing indicator */
+  margin-top: 5px; /* Margin at the top of the typing indicator */
+}

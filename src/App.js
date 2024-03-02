@@ -16,7 +16,9 @@ class ChatApp extends React.Component {
             password: '',
             selectedMessageId: null,
             contextMenuVisible: false,
+            otherUsersTyping: {}, // Object to track typing status of other users
         };
+        this.typingTimeouts = {}; // Object to track typing timeouts for each user
         this.chatContainerRef = React.createRef();
     }
 
@@ -27,6 +29,16 @@ class ChatApp extends React.Component {
                 this.fetchMessages();
             } else {
                 this.setState({ user: null });
+            }
+        });
+
+        // Listen for typing events from other users
+        firebase.database().ref('typing').on('value', snapshot => {
+            const typingData = snapshot.val();
+            if (typingData) {
+                this.setState({ otherUsersTyping: typingData });
+            } else {
+                this.setState({ otherUsersTyping: {} });
             }
         });
     }
@@ -54,7 +66,6 @@ class ChatApp extends React.Component {
             }
         });
     };
-    
 
     scrollToBottom = () => {
         if (this.chatContainerRef.current) {
@@ -68,9 +79,27 @@ class ChatApp extends React.Component {
     };
 
     handleChange = (e) => {
-        this.setState({ newMessage: e.target.value });
+        const { user } = this.state;
+        const newText = e.target.value;
+    
+        // Clear any previous typing timeout for this user
+        if (this.typingTimeouts[user.uid]) {
+            clearTimeout(this.typingTimeouts[user.uid]);
+        }
+    
+        // Send typing status to database
+        firebase.database().ref('typing').child(user.uid).set(true);
+    
+        // Set a new typing timeout for this user
+        this.typingTimeouts[user.uid] = setTimeout(() => {
+            // Remove typing status from database after 3 seconds
+            firebase.database().ref('typing').child(user.uid).remove();
+        }, 1000);
+    
+        // Update newMessage state with the typed text
+        this.setState({ newMessage: newText });
     };
-
+    
     handleSubmit = (e) => {
         e.preventDefault();
         const { newMessage, user } = this.state;
@@ -180,12 +209,13 @@ class ChatApp extends React.Component {
             console.error('Error liking message:', error);
         });
     };
-     handleScrollToEnd = () => {
+    
+    handleScrollToEnd = () => {
         this.scrollToBottom();
     };
 
     render() {
-        const { messages, newMessage, loading, user, email, password, contextMenuVisible } = this.state;
+        const { messages, newMessage, loading, user, email, password, contextMenuVisible, otherUsersTyping } = this.state;
 
         return (
             <div className="app-container container">
@@ -245,11 +275,14 @@ class ChatApp extends React.Component {
                             <button className="context-menu-item" onClick={this.handleDeleteMessage}>Delete</button>
                             <button className="context-menu-item" onClick={() => this.handleEditMessage('New text')}>Edit</button>
                         </div>
-                        
                     )}
-                     {/* <button className="scroll-to-end-button" onClick={this.handleScrollToEnd}>Scroll to End</button> */}
+                    {/* <button className="scroll-to-end-button" onClick={this.handleScrollToEnd}>Scroll to End</button> */}
                 </div>
-             
+                {/* Show typing indicator for other users */}
+                {Object.keys(otherUsersTyping).map(userId => (
+                    // Display typing indicator only for other users, not for the current user
+                    userId !== user.uid && <div key={userId} className="typing-indicator">typing...</div>
+                ))}
             </div>
         );
     }
