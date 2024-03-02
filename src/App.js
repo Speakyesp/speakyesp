@@ -407,7 +407,7 @@ class ChatApp extends React.Component {
                                 onChange={this.handleChange}
                                 disabled={loading}
                             />
-                            <label htmlFor="file-upload" className="upload-button">Select Image</label>
+                            <label htmlFor="file-upload" className="upload-button">@</label>
                             <input
                                 id="file-upload"
                                 type="file"
