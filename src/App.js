@@ -180,7 +180,7 @@ class ChatApp extends React.Component {
             console.error('Error liking message:', error);
         });
     };
-    handleScrollToEnd = () => {
+     handleScrollToEnd = () => {
         this.scrollToBottom();
     };
 
@@ -198,7 +198,7 @@ class ChatApp extends React.Component {
                 <div className="chat-container" ref={this.chatContainerRef}>
                     {user && (
                         <div className="message-container">
-                             {messages.slice(0).reverse().map((message, index)=> (
+                            {messages.map((message, index) => (
                                 <div
                                     key={index}
                                     className={`message-bubble ${message.userId === user?.uid ? 'your-message' : 'other-user-message'}`}
@@ -247,7 +247,7 @@ class ChatApp extends React.Component {
                         </div>
                         
                     )}
-                     <button className="scroll-to-end-button" onClick={this.handleScrollToEnd}>Scroll to End</button>
+                     {/* <button className="scroll-to-end-button" onClick={this.handleScrollToEnd}>Scroll to End</button> */}
                 </div>
              
             </div>
