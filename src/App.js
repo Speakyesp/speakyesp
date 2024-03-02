@@ -216,7 +216,7 @@ class ChatApp extends React.Component {
 
     render() {
         const { messages, newMessage, loading, user, email, password, contextMenuVisible, otherUsersTyping } = this.state;
-
+    
         return (
             <div className="app-container container">
                 <nav className="navbar">
@@ -239,9 +239,13 @@ class ChatApp extends React.Component {
                                     <span className="message-time">{new Date(message.timestamp).toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true })}</span>
                                 </div>
                             ))}
+                            {/* Display typing indicator below the last message */}
+                            {Object.keys(otherUsersTyping).map(userId => (
+                                userId !== user.uid && <div key={userId} className="typing-indicator">typing...</div>
+                            ))}
                         </div>
                     )}
-
+    
                     {user ? (
                         <form className="message-input" onSubmit={this.handleSubmit}>
                             <input
@@ -276,16 +280,12 @@ class ChatApp extends React.Component {
                             <button className="context-menu-item" onClick={() => this.handleEditMessage('New text')}>Edit</button>
                         </div>
                     )}
-                    {/* <button className="scroll-to-end-button" onClick={this.handleScrollToEnd}>Scroll to End</button> */}
                 </div>
-                {/* Show typing indicator for other users */}
-                {Object.keys(otherUsersTyping).map(userId => (
-                    // Display typing indicator only for other users, not for the current user
-                    userId !== user.uid && <div key={userId} className="typing-indicator">typing...</div>
-                ))}
+                {/* <button className="scroll-to-end-button" onClick={this.handleScrollToEnd}>Scroll to End</button> */}
             </div>
         );
     }
+    
 }
 
 export default ChatApp;
