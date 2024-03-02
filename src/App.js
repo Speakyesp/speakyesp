@@ -55,6 +55,7 @@ class ChatApp extends React.Component {
         const messaging = getMessaging();
         onMessage(messaging, (payload) => {
             console.log('Message received:', payload);
+            // Handle incoming message here, you can update state or trigger notifications
         });
     };
 
@@ -243,7 +244,6 @@ class ChatApp extends React.Component {
                 this.setState({ loading: false });
             });
     };
-    
 
     handleEmailLogin = async () => {
         const { email, password } = this.state;
@@ -290,9 +290,6 @@ class ChatApp extends React.Component {
             });
     };
     
-    
-    
-
     handleEditMessage = (newText) => {
         const { selectedMessageId } = this.state;
         const db = getDatabase();
