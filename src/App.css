@@ -231,5 +231,5 @@ body {
 .typing-indicator {
   color: #999; /* Color of the typing indicator */
   font-size: 12px; /* Font size of the typing indicator */
-  margin-top: -50px; /* Margin at the top of the typing indicator */
+  margin-top: -46px; /* Margin at the top of the typing indicator */
 }
