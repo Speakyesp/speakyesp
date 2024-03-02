@@ -174,23 +174,31 @@ class ChatApp extends React.Component {
         }
     };
 
-    uploadImage = (file) => {
+   uploadImage = (file) => {
+    // Upload the image file to Firebase Storage
+    return new Promise((resolve, reject) => {
+        // Get a reference to Firebase Storage
+        const storageRef = firebase.storage().ref();
+        
+        // Specify the path where the image will be stored
+        const imageRef = storageRef.child(`images/${file.name}`);
+        
         // Upload the image file to Firebase Storage
-        return new Promise((resolve, reject) => {
-            const storageRef = firebase.storage().ref();
-            const imageRef = storageRef.child(`images/${file.name}`);
-            imageRef.put(file)
-                .then(snapshot => {
-                    return snapshot.ref.getDownloadURL();
-                })
-                .then(downloadURL => {
-                    resolve(downloadURL);
-                })
-                .catch(error => {
-                    reject(error);
-                });
-        });
-    };
+        imageRef.put(file)
+            .then(snapshot => {
+                // Once upload is complete, get the download URL of the image
+                return snapshot.ref.getDownloadURL();
+            })
+            .then(downloadURL => {
+                // Resolve the promise with the download URL
+                resolve(downloadURL);
+            })
+            .catch(error => {
+                // If any error occurs during the upload process, reject the promise with the error
+                reject(error);
+            });
+    });
+};
 
     sendMessageWithImage = (newMessage, user, imageURL, repliedMessage) => {
         const db = getDatabase();
