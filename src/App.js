@@ -273,7 +273,7 @@ class ChatApp extends React.Component {
                             />
                             <button className="login-button" onClick={this.handleEmailLogin}>Login</button>
                         </div>
-                    )}
+                   
                 
                 </div>
                 {/* <button className="scroll-to-end-button" onClick={this.handleScrollToEnd}>Scroll to End</button> */}
