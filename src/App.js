@@ -5,6 +5,7 @@ import Modal from './Modal';
 import { getDatabase, ref, push, serverTimestamp, update } from "firebase/database";
 import { getMessaging, onMessage } from 'firebase/messaging';
 import chatIcon from './chatus.png'; 
+import notificationSoundFile from './sound.mp3'; // Import the notification sound file
 
 class ChatApp extends React.Component {
     constructor(props) {
@@ -28,6 +29,9 @@ class ChatApp extends React.Component {
         };
         this.typingTimeouts = {};
         this.chatContainerRef = React.createRef();
+
+        // Pre-import the notification sound
+        this.notificationSound = new Audio(notificationSoundFile);
     }
 
     componentDidMount() {
@@ -49,58 +53,7 @@ class ChatApp extends React.Component {
                 this.setState({ otherUsersTyping: {} });
             }
         });
-
-        this.requestNotificationPermission(); // Request notification permission on component mount
     }
-
-    requestNotificationPermission = () => {
-        if (!('Notification' in window)) {
-            console.warn('Notifications not supported in this browser.');
-            return;
-        }
-    
-        Notification.requestPermission().then(permission => {
-            if (permission === 'granted') {
-                console.log('Notification permission granted.');
-                // You can now listen for incoming messages
-                this.listenForMessages();
-            } else {
-                console.warn('Notification permission denied.');
-            }
-        }).catch(error => {
-            console.error('Error requesting notification permission:', error);
-        });
-    };
-    
-
-    listenForMessages = () => {
-        const messaging = getMessaging();
-        onMessage(messaging, (payload) => {
-            console.log('Message received:', payload);
-            // Handle incoming message here, you can update state or trigger notifications
-            this.handleIncomingMessage(payload);
-        });
-    };
-
-    handleIncomingMessage = (payload) => {
-        // Extract relevant data from the payload
-        const { notification } = payload;
-
-        // Display a notification
-        this.displayNotification(notification);
-    };
-
-    displayNotification = (notification) => {
-        if (Notification.permission === 'granted') {
-            // Show the notification
-            new Notification(notification.title, {
-                body: notification.body,
-                icon: notification.icon,
-            });
-        } else {
-            console.warn('Notification permission not granted.');
-        }
-    };
 
     initFirebaseMessaging = () => {
         const messaging = getMessaging();
@@ -271,6 +224,9 @@ class ChatApp extends React.Component {
         const db = getDatabase();
         const messagesRef = ref(db, 'messages');
         const currentUserEmail = user.email;
+
+        // Play notification sound
+        this.notificationSound.play();
 
         push(messagesRef, {
             text: newMessage,
