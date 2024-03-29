@@ -3,7 +3,6 @@ import './App.css';
 import firebase from './firebase';
 import Modal from './Modal'; 
 import { getDatabase, ref, push, serverTimestamp, update } from "firebase/database";
-import { getMessaging, onMessage } from 'firebase/messaging';
 import chatIcon from './chatus.png'; 
 
 class ChatApp extends React.Component {
@@ -35,7 +34,6 @@ class ChatApp extends React.Component {
             if (user) {
                 this.setState({ user });
                 this.fetchMessages();
-                this.initFirebaseMessaging();
             } else {
                 this.setState({ user: null });
             }
@@ -50,42 +48,7 @@ class ChatApp extends React.Component {
             }
         });
     }
-
-    initFirebaseMessaging = () => {
-        const messaging = getMessaging();
     
-        // Request permission for notifications
-        Notification.requestPermission().then(permission => {
-            if (permission === 'granted') {
-                console.log('Notification permission granted.');
-                // Handle incoming messages when app is in foreground
-                onMessage(messaging, (payload) => {
-                    console.log('Message received:', payload);
-                    // Trigger a notification for the received message
-                    this.triggerNotification(payload);
-                    // Handle incoming message here, you can update state or trigger notifications
-                });
-            } else {
-                console.log('Unable to get permission to notify.');
-            }
-        }).catch(error => {
-            console.error('Error requesting notification permission:', error);
-        });
-    };
-    
-    triggerNotification = (payload) => {
-        // Check if the payload contains the necessary data for the notification
-        if (payload.notification) {
-            const { title, body } = payload.notification;
-            // Display the notification
-            new Notification(title, {
-                body: body,
-                icon: chatIcon
-            });
-        }
-    };
-    
-
     fetchMessages = () => {
         const messagesRef = firebase.database().ref('messages');
         messagesRef.orderByChild('timestamp').on('value', async snapshot => {
@@ -100,6 +63,7 @@ class ChatApp extends React.Component {
                         senderEmail: senderEmail
                     };
                 }));
+    
                 this.setState({ messages: messagesWithUsers }, () => {
                     if (this.isScrolledToBottom()) {
                         this.scrollToBottom();
@@ -108,6 +72,7 @@ class ChatApp extends React.Component {
             }
         });
     };
+    
 
     scrollToBottom = () => {
         if (this.chatContainerRef.current) {
@@ -324,23 +289,6 @@ class ChatApp extends React.Component {
         });
     };
 
-    handleLikeMessage = () => {
-        const { selectedMessageId, user } = this.state;
-        if (!user || !selectedMessageId) return;
-
-        const db = getDatabase();
-        const messageRef = ref(db, `messages/${selectedMessageId}/likes`);
-        push(messageRef, {
-            userId: user.uid,
-            timestamp: serverTimestamp()
-        }).then(() => {
-            console.log('Message liked successfully');
-            this.setState({ selectedMessageId: null });
-        }).catch(error => {
-            console.error('Error liking message:', error);
-        });
-    };
-
     handleHoverMessage = (messageId) => {
         this.setState({ hoveredMessageId: messageId });
     };
@@ -365,7 +313,7 @@ class ChatApp extends React.Component {
     };
 
     render() {
-        const { messages, newMessage, loading, user, email, password, otherUsersTyping, showModal, modalImageURL, imagePreviewURL, hoveredMessageId, repliedMessage } = this.state;
+        const { messages, newMessage, loading, user, email, password, otherUsersTyping, showModal, modalImageURL, imagePreviewURL,  repliedMessage } = this.state;
     
         return (
             <div className="app-container container">
@@ -399,11 +347,7 @@ class ChatApp extends React.Component {
                                         </div>
                                     )}
                                     <span className="message-time">{new Date(message.timestamp).toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true })}</span>
-                                    {hoveredMessageId === message.id && (
-                                        <div className="message-options">
-                                            <button onClick={() => this.handleDeleteMessage(message.id)}>Delete</button>
-                                        </div>
-                                    )}
+                                   
                                 </div>
                             ))}
                             {Object.keys(otherUsersTyping).map(userId => (
