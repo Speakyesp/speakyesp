@@ -5,7 +5,6 @@ import Modal from './Modal';
 import { getDatabase, ref, push, serverTimestamp, update } from "firebase/database";
 import { getMessaging, onMessage } from 'firebase/messaging';
 import chatIcon from './chatus.png'; 
-import notificationSoundFile from './sound.mp3'; // Import the notification sound file
 
 class ChatApp extends React.Component {
     constructor(props) {
@@ -29,9 +28,6 @@ class ChatApp extends React.Component {
         };
         this.typingTimeouts = {};
         this.chatContainerRef = React.createRef();
-
-        // Pre-import the notification sound
-        this.notificationSound = new Audio(notificationSoundFile);
     }
 
     componentDidMount() {
@@ -57,11 +53,38 @@ class ChatApp extends React.Component {
 
     initFirebaseMessaging = () => {
         const messaging = getMessaging();
-        onMessage(messaging, (payload) => {
-            console.log('Message received:', payload);
-            // Handle incoming message here, you can update state or trigger notifications
+    
+        // Request permission for notifications
+        Notification.requestPermission().then(permission => {
+            if (permission === 'granted') {
+                console.log('Notification permission granted.');
+                // Handle incoming messages when app is in foreground
+                onMessage(messaging, (payload) => {
+                    console.log('Message received:', payload);
+                    // Trigger a notification for the received message
+                    this.triggerNotification(payload);
+                    // Handle incoming message here, you can update state or trigger notifications
+                });
+            } else {
+                console.log('Unable to get permission to notify.');
+            }
+        }).catch(error => {
+            console.error('Error requesting notification permission:', error);
         });
     };
+    
+    triggerNotification = (payload) => {
+        // Check if the payload contains the necessary data for the notification
+        if (payload.notification) {
+            const { title, body } = payload.notification;
+            // Display the notification
+            new Notification(title, {
+                body: body,
+                icon: chatIcon
+            });
+        }
+    };
+    
 
     fetchMessages = () => {
         const messagesRef = firebase.database().ref('messages');
@@ -224,9 +247,6 @@ class ChatApp extends React.Component {
         const db = getDatabase();
         const messagesRef = ref(db, 'messages');
         const currentUserEmail = user.email;
-
-        // Play notification sound
-        this.notificationSound.play();
 
         push(messagesRef, {
             text: newMessage,
