@@ -27,6 +27,7 @@ body {
   padding: 10px 20px;
   background-color: #ffffff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  animation: slideInFromTop 0.5s ease;
 }
 
 .navbar-title {
@@ -40,6 +41,12 @@ body {
   border: none;
   color: #ed4956; /* Instagram red */
   cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.logout-button:hover {
+  background-color: #e1e1e1; /* Light gray */
+  border-radius: 2px;
 }
 
 /* Login Container */
@@ -68,6 +75,7 @@ body {
   padding: 12px;
   border: 1px solid #dbdbdb;
   border-radius: 4px;
+  font-size: 1em;
 }
 
 .login-button {
@@ -75,13 +83,14 @@ body {
   padding: 12px;
   border: none;
   border-radius: 4px;
-  background-color: #2a5eb8;  /* Instagram blue */
+  background-color: #2a5eb8; /* Instagram blue */
   color: #fff;
   cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
 .login-button:hover {
-  background-color: #2a5eb8; /* Darker blue */
+  background-color: #1e4b8f; /* Darker blue */
 }
 
 /* Chat Container */
@@ -89,7 +98,6 @@ body {
   padding-top: 60px; /* Adjust based on navbar height */
   padding-bottom: 100px; /* Adjust based on message input height */
   background-color: #fafafa;
-  padding: 20px;
   border-radius: 10px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
@@ -156,6 +164,7 @@ body {
   z-index: 1000; /* Ensure it's above other content */
   display: flex;
   margin: 20px;
+  animation: slideInFromBottom 0.5s ease;
 }
 
 .message-input input[type="text"] {
@@ -164,6 +173,12 @@ body {
   border: 1px solid #dbdbdb;
   border-radius: 4px;
   font-size: 1em;
+  background-color: #f2f2f2; /* Light gray */
+  transition: border-color 0.3s ease;
+}
+
+.message-input input[type="text"]:focus {
+  border-color: #a3c0a4; /* Green */
 }
 
 .message-input button {
@@ -173,81 +188,18 @@ body {
   background-color: #3897f0; /* Instagram blue */
   color: #fff;
   cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
 .message-input button:hover {
-  background-color: #2a5eb8; /* Darker blue */
+  background-color: #2a5eb8; /* Darker blue on hover */
 }
 
 /* Typing Indicator */
 .typing-indicator {
-  color: #999; /* Color of the typing indicator */
-  font-size: 12px; /* Font size of the typing indicator */
-  margin-top: -100px; /* Margin at the top of the typing indicator */
+  color: #f44336; /* Red */
 }
 
-/* For screens smaller than 400px (Mobile view) */
-@media (max-width: 400px) {
-  /* Navbar */
-  .navbar {
-    padding: 5px;
-  }
-
-  /* Message Input Form */
-  .message-input {
-    margin: 10px;
-  }
-
-  .message-input input[type="text"] {
-    margin-bottom: 0; /* Remove space between input and button */
-  }
-
-  /* Adjust padding for chat container */
-  .chat-container {
-    padding-top: 50px; /* Adjust as per navbar height */
-    padding-bottom: 80px; /* Adjust as per message input height */
-  }
-}
-/* Image Container */
-.image-container {
-  max-width: 300px; /* Maximum width of the image container */
-  max-height: 300px; /* Maximum height of the image container */
-  overflow: hidden; /* Hide overflow if image exceeds container size */
-}
-
-/* Image */
-.image-container img {
-  width: 100%; /* Ensure image fills the container width */
-  height: auto; /* Maintain aspect ratio */
-}
-/* File Input Button */
-.message-input input[type="file"] {
-  display: none; /* Hide the default file input */
-}
-
-.upload-button {
-  padding: 12px 20px;
-  border: none;
-  border-radius: 4px;
-  background-color: #2a5eb8; /* Instagram blue */
-  color: #fff;
-  cursor: pointer;
-  display: inline-block;
-}
-
-.upload-button:hover {
-  background-color: #1e4b8f; /* Darker blue on hover */
-}
-.image-preview {
-  margin-top: 10px; /* Adjust margin as needed */
-}
-
-.image-preview img {
-  max-width: 100%; /* Ensure the image fits within its container */
-  height: auto; /* Maintain aspect ratio */
-  border: 1px solid #ccc; /* Add border for clarity */
-  border-radius: 5px; /* Add border radius for rounded corners */
-}
 /* Image Container */
 .image-container {
   max-width: 300px; /* Maximum width of the image container */
@@ -274,6 +226,7 @@ body {
   color: #fff;
   cursor: pointer;
   display: inline-block;
+  transition: background-color 0.3s ease;
 }
 
 .upload-button:hover {
@@ -283,6 +236,7 @@ body {
 /* Image Preview */
 .image-preview {
   margin-top: 10px; /* Adjust margin as needed */
+  animation: fadeIn 0.5s ease;
 }
 
 .image-preview img {
@@ -291,6 +245,7 @@ body {
   border: 1px solid #ccc; /* Add border for clarity */
   border-radius: 5px; /* Add border radius for rounded corners */
 }
+
 /* Modal */
 .modal {
   display: none;
@@ -326,6 +281,7 @@ body {
 .close:hover {
   color: #ccc;
 }
+
 /* Message Options Container */
 .message-options {
   display: none; /* Initially hide the delete button */
@@ -341,7 +297,7 @@ body {
   width: 100%;
   height: auto;
 }
-/* Delete Button */
+
 /* Delete Button */
 .delete-button {
   background-color: #ed4956; /* Instagram red */
@@ -351,17 +307,18 @@ body {
   padding: 8px 12px;
   margin-left: 5px;
   cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
 .delete-button:hover {
   background-color: #c9302c; /* Darker red on hover */
 }
 
-
 /* Show the delete button when hovering over the message */
 .message-bubble:hover .delete-button {
   display: block;
 }
+
 /* Animations */
 @keyframes fadeIn {
   from {
@@ -383,6 +340,17 @@ body {
   }
 }
 
+@keyframes slideInFromBottom {
+  from {
+    transform: translateY(50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
 @keyframes slideInFromRight {
   from {
     transform: translateX(50px);
@@ -393,79 +361,207 @@ body {
     opacity: 1;
   }
 }
-
-@keyframes slideInFromLeft {
-  from {
-    transform: translateX(-50px);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(0);
-    opacity: 1;
-  }
-}
-
-/* Additional Styles */
-
-/* Navbar */
-.navbar {
-  /* background-color: #4CAF50; Green */
-  animation: slideInFromTop 0.5s ease;
-}
-
-.logout-button {
-  color: #000000; /* White */
-  transition: background-color 0.3s ease;
-}
-
-.logout-button:hover {
-  background-color: #e1e1e1; /* Red */
-  border-radius: 2PX;
-}
-
-/* Your Message */
-.message-bubble.your-message {
-  background-color: #2196F3; /* Blue */
-}
-
-/* Other User's Message */
-.message-bubble.other-user-message {
-  background-color: #e2e2e2; /* Red */
-}
-
 /* Message Input Form */
 .message-input {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000; /* Ensure it's above other content */
+  display: flex;
+  margin: 20px;
   animation: slideInFromBottom 0.5s ease;
+  background-color: #f9f9f9; /* Light background for contrast */
+  border: 1px solid #dbdbdb; /* Border for visibility */
+  border-radius: 8px; /* Rounded corners */
+  padding: 10px; /* Padding for better spacing */
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
 }
 
-.message-input input[type="text"] {
-  background-color: #f2f2f2; /* Light gray */
+/* Message Input Field */
+.message-input-field {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #dbdbdb;
+  border-radius: 4px;
+  font-size: 1em;
+  background-color: #ffffff; /* White background */
   transition: border-color 0.3s ease;
 }
 
-.message-input input[type="text"]:focus {
-  border-color: #a3c0a4; /* Green */
+.message-input-field:focus {
+  border-color: #3897f0; /* Blue border on focus */
+  outline: none; /* Remove default outline */
 }
 
-.message-input button {
-  background-color: #008CBA; /* Dark blue */
+/* Upload and Send Buttons */
+.upload-button, .send-button {
+  padding: 10px 15px;
+  border: none;
+  border-radius: 4px;
+  color: #fff;
+  cursor: pointer;
   transition: background-color 0.3s ease;
 }
 
-.message-input button:hover {
-  background-color: #005A8C; /* Darker blue */
+.upload-button {
+  background-color: #2a5eb8; /* Instagram blue */
 }
 
-/* Typing Indicator */
-.typing-indicator {
-  color: #f44336; /* Red */
+.upload-button:hover {
+  background-color: #1e4b8f; /* Darker blue on hover */
+}
+
+.send-button {
+  background-color: #3897f0; /* Instagram blue */
+}
+
+.send-button:hover {
+  background-color: #2a5eb8; /* Darker blue on hover */
 }
 
 /* Image Preview */
 .image-preview {
+  margin-top: 10px; /* Space between the input and preview */
   animation: fadeIn 0.5s ease;
 }
 
 .image-preview img {
-  border-color: #4CAF50; /* Green */
+  max-width: 100%; /* Ensure the image fits within its container */
+  height: auto; /* Maintain aspect ratio */
+  border: 1px solid #ccc; /* Add border for clarity */
+  border-radius: 5px; /* Add border radius for rounded corners */
+}
+.app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: #f0f0f0; /* Light background */
+  font-family: 'Arial', sans-serif; /* Modern font */
+}
+
+.navbar {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  background-color: #ffffff; /* Primary color */
+  color: white;
+}
+
+.chat-icon {
+  height: 40px; /* Adjusted icon size */
+  margin-right: 10px;
+}
+
+.logout-button {
+  margin-left: auto;
+  padding: 8px 12px;
+  background-color: #ff4081; /* Secondary color */
+  border: none;
+  border-radius: 5px;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.logout-button:hover {
+  background-color: #f50057; /* Darker shade on hover */
+}
+
+.chat-container {
+  flex: 0.9;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+.message-container {
+  margin-bottom: 20px;
+}
+
+.date-separator {
+  margin: 10px 0;
+  font-weight: bold;
+  color: #666;
+  text-align: center;
+}
+
+.message-bubble {
+  padding: 10px 15px;
+  margin: 5px 0;
+  border-radius: 20px;
+  position: relative;
+}
+
+.your-message {
+  background-color: #bbdefb; /* Light blue for own messages */
+  align-self: flex-end; /* Align own messages to the right */
+}
+
+.other-user-message {
+  background-color: #fff; /* White for other messages */
+  align-self: flex-start; /* Align other messages to the left */
+}
+
+.message-sender {
+  font-weight: bold;
+}
+
+.input-container {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  /* background-color: white; Input area background */
+  border-top: 1px solid #ddd; /* Subtle border */
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+  flex: 0.9;
+  padding: 10px;
+  border-radius: 20px; /* Rounded corners */
+  border: 1px solid #ccc; /* Subtle border */
+  margin-right: 10px; /* Space between input and buttons */
+  transition: border-color 0.3s;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus {
+  border-color: #6200ea; /* Primary color on focus */
+  outline: none; /* Remove default outline */
+}
+
+button {
+  padding: 10px 15px;
+  border-radius: 20px; /* Rounded corners */
+  border: none;
+  color: white;
+  background-color: #6200ea; /* Primary color */
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+button:hover {
+  background-color: #3700b3; /* Darker shade on hover */
+}
+
+.image-preview {
+  margin-left: 10px;
+  border-radius: 10px;
+  overflow: hidden; /* Rounded corners for image */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+}
+
+.image-preview img {
+  max-width: 100px; /* Limit the size of the preview */
+  border-radius: 10px; /* Rounded corners */
+}
+
+.replied-message {
+  padding: 10px;
+  border: 1px solid #6200ea; /* Highlighted border */
+  border-radius: 10px; /* Rounded corners */
+  margin-bottom: 10px;
+  background-color: #e8f0fe; /* Light background */
 }
