@@ -152,24 +152,13 @@ class ChatApp extends React.Component {
         const messagesRef = ref(db, 'messages');
         const currentUserEmail = user.email;
 
-        push(messagesRef, {
+        return push(messagesRef, {
             text: newMessage,
             userId: user.uid,
             email: currentUserEmail,
             timestamp: serverTimestamp(),
             imageBase64: imageBase64,
             repliedMessage: repliedMessage ? repliedMessage : null,
-        })
-        .then(() => {
-            this.setState({
-                newMessage: '',
-                loading: false,
-                repliedMessage: null,
-            });
-        })
-        .catch(error => {
-            console.error('Error sending message:', error);
-            this.setState({ loading: false });
         });
     };
 
@@ -178,23 +167,12 @@ class ChatApp extends React.Component {
         const messagesRef = ref(db, 'messages');
         const currentUserEmail = user.email;
 
-        push(messagesRef, {
+        return push(messagesRef, {
             text: newMessage,
             userId: user.uid,
             email: currentUserEmail,
             timestamp: serverTimestamp(),
             repliedMessage: repliedMessage ? repliedMessage : null,
-        })
-        .then(() => {
-            this.setState({
-                newMessage: '',
-                loading: false,
-                repliedMessage: null,
-            });
-        })
-        .catch(error => {
-            console.error('Error sending message:', error);
-            this.setState({ loading: false });
         });
     };
 
@@ -248,6 +226,13 @@ class ChatApp extends React.Component {
             return format(date, 'MMMM dd, yyyy');
         }
     };
+    handleKeyDown = (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) { // Check if Enter is pressed and Shift is not held
+            e.preventDefault(); // Prevent the default behavior (like adding a new line)
+            this.handleSubmit(e);
+        }
+    };
+    
 
     render() {
         const { messages, newMessage, loading, user, email, password, imagePreviewURL, repliedMessage } = this.state;
@@ -289,54 +274,60 @@ class ChatApp extends React.Component {
                     )}
                 </div>
 
-                {user ? (
-                    <div className="input-container">
-                        {repliedMessage && (
-                            <div className="replied-message">
-                                <span>Replying to: {repliedMessage.text}</span>
-                                <button onClick={() => this.setState({ repliedMessage: null })}>Cancel</button>
-                            </div>
-                        )}
-                        <input
-                            type="text"
-                            value={newMessage}
-                            onChange={this.handleChange}
-                            placeholder="Type a message"
-                        />
-                        <input
-                            type="file"
-                            accept="image/*"
-                            onChange={this.handleImageChange}
-                            ref={fileInputRef}
-                            style={{ display: 'none' }}
-                        />
-                        <button onClick={() => fileInputRef.current.click()}>📷</button>
-                        <button onClick={this.handleSubmit} disabled={loading}>
-                            {loading ? 'Sending...' : 'Send'}
-                        </button>
-                        {imagePreviewURL && (
-                            <div className="image-preview">
-                                <img src={imagePreviewURL} alt="Preview" />
-                            </div>
-                        )}
-                    </div>
-                ) : (
-                    <div className="login-container">
-                        <input
-                            type="email"
-                            value={email}
-                            onChange={(e) => this.setState({ email: e.target.value })}
-                            placeholder="Email"
-                        />
-                        <input
-                            type="password"
-                            value={password}
-                            onChange={(e) => this.setState({ password: e.target.value })}
-                            placeholder="Password"
-                        />
-                        <button onClick={this.handleEmailLogin}>Login</button>
-                    </div>
-                )}
+                <div className="input-container">
+    {loading && <div className="loader">Sending...</div>} {/* Loader here */}
+    {user ? (
+        <>
+            {repliedMessage && (
+                <div className="replied-message">
+                    <span>Replying to: {repliedMessage.text}</span>
+                    <button onClick={() => this.setState({ repliedMessage: null })}>Cancel</button>
+                </div>
+            )}
+            <input
+                type="text"
+                value={newMessage}
+                onChange={this.handleChange}
+                onKeyDown={this.handleKeyDown} // Changed to onKeyDown
+                placeholder="Type a message"
+                disabled={loading} // Disable input while loading
+            />
+            <input
+                type="file"
+                accept="image/*"
+                onChange={this.handleImageChange}
+                ref={fileInputRef}
+                style={{ display: 'none' }}
+            />
+            <button onClick={() => fileInputRef.current.click()}>📷</button>
+            <button onClick={this.handleSubmit} disabled={loading}>
+                {loading ? 'Sending...' : 'Send'}
+            </button>
+            {imagePreviewURL && (
+                <div className="image-preview">
+                    <img src={imagePreviewURL} alt="Preview" />
+                </div>
+            )}
+        </>
+    ) : (
+        <div className="login-container">
+            <input
+                type="email"
+                value={email}
+                onChange={(e) => this.setState({ email: e.target.value })}
+                placeholder="Email"
+            />
+            <input
+                type="password"
+                value={password}
+                onChange={(e) => this.setState({ password: e.target.value })}
+                placeholder="Password"
+            />
+            <button onClick={this.handleEmailLogin}>Login</button>
+        </div>
+    )}
+</div>
+
             </div>
         );
     }
