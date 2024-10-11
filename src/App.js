@@ -4,7 +4,7 @@ import firebase from './firebase';
 import { getDatabase, ref, push, serverTimestamp } from "firebase/database";
 import chatIcon from './chatus.png';
 import { format, isToday, isYesterday } from 'date-fns'; // Date formatting
-
+import AudioCall from './AudioCall';
 
 class ChatApp extends React.Component {
     constructor(props) {
@@ -265,10 +265,15 @@ class ChatApp extends React.Component {
                                             key={index}
                                             className={`message-bubble ${message.userId === user?.uid ? 'your-message' : 'other-user-message'}`}
                                             onMouseDown={(e) => this.handleLongPress(message, e)} // Handling long press for mouse
-                                            onTouchStart={(e) => this.handleLongPress(message, e)} // Handling long press for touch devices
+                                            onTouchStart={(e) => this.handleLongPress(message, e)} // Handling long press for touch
                                         >
-                                            <span className="message-sender">{message.userId === user?.uid ? 'You' : message.senderEmail}: </span>
-                                            {message.text}
+                                            <span className="sender-name">{message.userId === user?.uid ? 'You' : message.senderEmail}: </span>
+                                            {message.repliedMessage && (
+                                                <div className="replied-message-preview">
+                                                    <span>Replying to: {message.repliedMessage.text}</span>
+                                                </div>
+                                            )}
+                                            <span>{message.text}</span>
                                             {message.imageBase64 && (
                                                 <div className="image-container">
                                                     <img src={message.imageBase64} alt="Shared" />
