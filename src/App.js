@@ -1,9 +1,9 @@
 import React from 'react';
-import './App.css'; 
+import './App.css';
 import firebase from './firebase';
-import Modal from './Modal'; 
+import Modal from './Modal';
 import { getDatabase, ref, push, serverTimestamp, update } from "firebase/database";
-import chatIcon from './chatus.png'; 
+import chatIcon from './chatus.png';
 
 class ChatApp extends React.Component {
     constructor(props) {
@@ -23,7 +23,7 @@ class ChatApp extends React.Component {
             modalImageURL: '',
             imagePreviewURL: '',
             hoveredMessageId: null,
-            repliedMessage: null, // State to store the replied message
+            repliedMessage: null,
         };
         this.typingTimeouts = {};
         this.chatContainerRef = React.createRef();
@@ -72,7 +72,6 @@ class ChatApp extends React.Component {
             }
         });
     };
-    
 
     scrollToBottom = () => {
         if (this.chatContainerRef.current) {
@@ -105,84 +104,50 @@ class ChatApp extends React.Component {
     handleImageChange = (e) => {
         const file = e.target.files[0];
         
-        // Read the selected image file and generate a preview
+        if (!file) return;
+        
         const reader = new FileReader();
         reader.onload = () => {
             this.setState({
                 imageFile: file,
-                imagePreviewURL: reader.result // Store the image preview URL in state
+                imagePreviewURL: reader.result // Base64 string
             });
         };
-        // Read the file as a Data URL
-        if (file) {
-            reader.readAsDataURL(file);
-        }
+        reader.readAsDataURL(file);
     };
 
     handleSubmit = async (e) => {
         e.preventDefault();
-        const { newMessage, user, imageFile, repliedMessage } = this.state;
+        const { newMessage, user, imagePreviewURL, repliedMessage } = this.state;
 
-        if (!user) {
-            return;
-        }
-
-        // If both text message and image are empty, return
-        if (newMessage.trim() === '' && !imageFile) {
-            return;
-        }
+        if (!user || (newMessage.trim() === '' && !imagePreviewURL)) return;
 
         this.setState({ loading: true });
 
         try {
-            if (imageFile) {
-                // Upload the image
-                const imageURL = await this.uploadImage(imageFile);
-                // Send message with image URL
-                await this.sendMessageWithImage(newMessage, user, imageURL, repliedMessage);
-                // Clear image preview after sending
+            if (imagePreviewURL) {
+                await this.sendMessageWithBase64Image(newMessage, user, imagePreviewURL, repliedMessage);
                 this.setState({
                     imageFile: null,
                     imagePreviewURL: ''
                 });
             } else {
-                // Send text message only
                 await this.sendMessage(newMessage, user, repliedMessage);
             }
 
-            // Reset state after sending message
             this.setState({
                 newMessage: '',
                 loading: false,
-                repliedMessage: null, // Clear replied message after sending
+                repliedMessage: null,
             });
         } catch (error) {
             console.error('Error sending message:', error);
-            // Show error message to the user
             alert('Failed to send message. Please try again.');
             this.setState({ loading: false });
         }
     };
 
-    uploadImage = (file) => {
-        // Upload the image file to Firebase Storage
-        return new Promise((resolve, reject) => {
-            const storageRef = firebase.storage().ref();
-            const imageRef = storageRef.child(`images/${file.name}`);
-            imageRef.put(file)
-                .then(snapshot => {
-                    return snapshot.ref.getDownloadURL();
-                })
-                .then(downloadURL => {
-                    resolve(downloadURL);
-                })
-                .catch(error => {
-                    reject(error);
-                });
-        });
-    };
-
-    sendMessageWithImage = (newMessage, user, imageURL, repliedMessage) => {
+    sendMessageWithBase64Image = (newMessage, user, imageBase64, repliedMessage) => {
         const db = getDatabase();
         const messagesRef = ref(db, 'messages');
         const currentUserEmail = user.email;
@@ -192,20 +157,20 @@ class ChatApp extends React.Component {
             userId: user.uid,
             email: currentUserEmail,
             timestamp: serverTimestamp(),
-            imageURL: imageURL, // Add imageURL to the message data
-            repliedMessage: repliedMessage ? repliedMessage : null, // Add replied message to the message data
+            imageBase64: imageBase64,
+            repliedMessage: repliedMessage ? repliedMessage : null,
         })
-            .then(() => {
-                this.setState({
-                    newMessage: '',
-                    loading: false,
-                    repliedMessage: null, // Clear replied message after sending
-                });
-            })
-            .catch(error => {
-                console.error('Error sending message:', error);
-                this.setState({ loading: false });
+        .then(() => {
+            this.setState({
+                newMessage: '',
+                loading: false,
+                repliedMessage: null,
             });
+        })
+        .catch(error => {
+            console.error('Error sending message:', error);
+            this.setState({ loading: false });
+        });
     };
 
     sendMessage = (newMessage, user, repliedMessage) => {
@@ -218,19 +183,19 @@ class ChatApp extends React.Component {
             userId: user.uid,
             email: currentUserEmail,
             timestamp: serverTimestamp(),
-            repliedMessage: repliedMessage ? repliedMessage : null, // Add replied message to the message data
+            repliedMessage: repliedMessage ? repliedMessage : null,
         })
-            .then(() => {
-                this.setState({
-                    newMessage: '',
-                    loading: false,
-                    repliedMessage: null, // Clear replied message after sending
-                });
-            })
-            .catch(error => {
-                console.error('Error sending message:', error);
-                this.setState({ loading: false });
+        .then(() => {
+            this.setState({
+                newMessage: '',
+                loading: false,
+                repliedMessage: null,
             });
+        })
+        .catch(error => {
+            console.error('Error sending message:', error);
+            this.setState({ loading: false });
+        });
     };
 
     handleEmailLogin = async () => {
@@ -256,64 +221,12 @@ class ChatApp extends React.Component {
         }
     };
 
-    handleContextMenu = (e, messageId) => {
-        e.preventDefault();
-        this.setState({
-            selectedMessageId: messageId,
-            contextMenuVisible: true
-        });
-    };
-
-    handleDeleteMessage = (messageId) => {
-        const db = firebase.database();
-        const messageRef = db.ref(`messages/${messageId}`);
-    
-        // Remove the message node from the database
-        messageRef.remove()
-            .then(() => {
-                console.log('Message deleted successfully');
-            })
-            .catch((error) => {
-                console.error('Error deleting message:', error);
-            });
-    };
-    
-    handleEditMessage = (newText) => {
-        const { selectedMessageId } = this.state;
-        const db = getDatabase();
-        const messageRef = ref(db, `messages/${selectedMessageId}`);
-        update(messageRef, { text: newText });
-        this.setState({
-            selectedMessageId: null,
-            contextMenuVisible: false
-        });
-    };
-
-    handleHoverMessage = (messageId) => {
-        this.setState({ hoveredMessageId: messageId });
-    };
-
-    handleCloseContextMenu = () => {
-        this.setState({ contextMenuVisible: false });
-    };
-
-    closeModal = () => {
-        this.setState({
-            showModal: false,
-            modalImageURL: '',
-        });
-    };
-
-    handleScrollToEnd = () => {
-        this.scrollToBottom();
-    };
-
     handleReplyToMessage = (message) => {
         this.setState({ repliedMessage: message });
     };
 
     render() {
-        const { messages, newMessage, loading, user, email, password, otherUsersTyping, showModal, modalImageURL, imagePreviewURL,  repliedMessage } = this.state;
+        const { messages, newMessage, loading, user, email, password, otherUsersTyping, showModal, modalImageURL, imagePreviewURL, repliedMessage } = this.state;
     
         return (
             <div className="app-container container">
@@ -330,15 +243,12 @@ class ChatApp extends React.Component {
                                 <div
                                     key={index}
                                     className={`message-bubble ${message.userId === user?.uid ? 'your-message' : 'other-user-message'}`}
-                                    onContextMenu={e => this.handleContextMenu(e, message.id)}
-                                    onMouseEnter={() => this.handleHoverMessage(message.id)}
-                                    onMouseLeave={this.handleCloseContextMenu}
                                 >
                                     <span className="message-sender">{message.userId === user?.uid ? 'You' : message.senderEmail}: </span>
                                     {message.text}
-                                    {message.imageURL && (
+                                    {message.imageBase64 && (
                                         <div className="image-container">
-                                            <img src={message.imageURL} alt="Shared" />
+                                            <img src={message.imageBase64} alt="Shared" />
                                         </div>
                                     )}
                                     {message.repliedMessage && (
@@ -347,7 +257,6 @@ class ChatApp extends React.Component {
                                         </div>
                                     )}
                                     <span className="message-time">{new Date(message.timestamp).toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true })}</span>
-                                   
                                 </div>
                             ))}
                             {Object.keys(otherUsersTyping).map(userId => (
@@ -377,36 +286,35 @@ class ChatApp extends React.Component {
                                 type="file"
                                 accept="image/*"
                                 onChange={this.handleImageChange}
-                                style={{ display: 'none' }}
                             />
+                            {imagePreviewURL && (
+                                <div className="image-preview">
+                                    <img src={imagePreviewURL} alt="Preview" />
+                                </div>
+                            )}
                             <button type="submit" disabled={loading}>Send</button>
                         </form>
                     ) : (
-                        <div className="login-form">
+                        <div className="login-container">
+                            <h2>Login</h2>
                             <input
                                 type="email"
                                 placeholder="Email"
                                 value={email}
-                                onChange={e => this.setState({ email: e.target.value })}
+                                onChange={(e) => this.setState({ email: e.target.value })}
                             />
                             <input
                                 type="password"
                                 placeholder="Password"
                                 value={password}
-                                onChange={e => this.setState({ password: e.target.value })}
+                                onChange={(e) => this.setState({ password: e.target.value })}
                             />
-                            <button className="login-button" onClick={this.handleEmailLogin}>Login</button>
+                            <button onClick={this.handleEmailLogin}>Login</button>
                         </div>
-                        
                     )}
                 </div>
                 {showModal && (
-                    <Modal imageURL={modalImageURL} closeModal={this.closeModal} />
-                )}
-                {imagePreviewURL && (
-                    <div className="image-preview">
-                        <img src={imagePreviewURL} alt="Selected" />
-                    </div>
+                    <Modal imageUrl={modalImageURL} onClose={() => this.setState({ showModal: false })} />
                 )}
             </div>
         );
