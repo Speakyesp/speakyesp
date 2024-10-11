@@ -1,9 +1,9 @@
 import React from 'react';
 import './App.css';
 import firebase from './firebase';
-import Modal from './Modal';
-import { getDatabase, ref, push, serverTimestamp, update } from "firebase/database";
+import { getDatabase, ref, push, serverTimestamp } from "firebase/database";
 import chatIcon from './chatus.png';
+import { format, isToday, isYesterday } from 'date-fns'; // Date formatting
 
 class ChatApp extends React.Component {
     constructor(props) {
@@ -48,7 +48,7 @@ class ChatApp extends React.Component {
             }
         });
     }
-    
+
     fetchMessages = () => {
         const messagesRef = firebase.database().ref('messages');
         messagesRef.orderByChild('timestamp').on('value', async snapshot => {
@@ -63,14 +63,45 @@ class ChatApp extends React.Component {
                         senderEmail: senderEmail
                     };
                 }));
-    
+
                 this.setState({ messages: messagesWithUsers }, () => {
-                    if (this.isScrolledToBottom()) {
-                        this.scrollToBottom();
-                    }
+                    this.scrollToBottom(); // Scroll to the bottom after fetching messages
                 });
             }
         });
+    };
+
+    handleSubmit = async (e) => {
+        e.preventDefault();
+        const { newMessage, user, imagePreviewURL, repliedMessage } = this.state;
+
+        if (!user || (newMessage.trim() === '' && !imagePreviewURL)) return;
+
+        this.setState({ loading: true });
+
+        try {
+            if (imagePreviewURL) {
+                await this.sendMessageWithBase64Image(newMessage, user, imagePreviewURL, repliedMessage);
+                this.setState({
+                    imageFile: null,
+                    imagePreviewURL: ''
+                });
+            } else {
+                await this.sendMessage(newMessage, user, repliedMessage);
+            }
+
+            this.setState({
+                newMessage: '',
+                loading: false,
+                repliedMessage: null,
+            }, () => {
+                this.scrollToBottom(); // Scroll to the bottom after sending a message
+            });
+        } catch (error) {
+            console.error('Error sending message:', error);
+            alert('Failed to send message. Please try again.');
+            this.setState({ loading: false });
+        }
     };
 
     scrollToBottom = () => {
@@ -103,9 +134,9 @@ class ChatApp extends React.Component {
 
     handleImageChange = (e) => {
         const file = e.target.files[0];
-        
+
         if (!file) return;
-        
+
         const reader = new FileReader();
         reader.onload = () => {
             this.setState({
@@ -114,37 +145,6 @@ class ChatApp extends React.Component {
             });
         };
         reader.readAsDataURL(file);
-    };
-
-    handleSubmit = async (e) => {
-        e.preventDefault();
-        const { newMessage, user, imagePreviewURL, repliedMessage } = this.state;
-
-        if (!user || (newMessage.trim() === '' && !imagePreviewURL)) return;
-
-        this.setState({ loading: true });
-
-        try {
-            if (imagePreviewURL) {
-                await this.sendMessageWithBase64Image(newMessage, user, imagePreviewURL, repliedMessage);
-                this.setState({
-                    imageFile: null,
-                    imagePreviewURL: ''
-                });
-            } else {
-                await this.sendMessage(newMessage, user, repliedMessage);
-            }
-
-            this.setState({
-                newMessage: '',
-                loading: false,
-                repliedMessage: null,
-            });
-        } catch (error) {
-            console.error('Error sending message:', error);
-            alert('Failed to send message. Please try again.');
-            this.setState({ loading: false });
-        }
     };
 
     sendMessageWithBase64Image = (newMessage, user, imageBase64, repliedMessage) => {
@@ -225,9 +225,35 @@ class ChatApp extends React.Component {
         this.setState({ repliedMessage: message });
     };
 
+    // Grouping messages by date
+    groupMessagesByDate = (messages) => {
+        return messages.reduce((acc, message) => {
+            const messageDate = new Date(message.timestamp);
+            const dateKey = format(messageDate, 'yyyy-MM-dd');
+            if (!acc[dateKey]) {
+                acc[dateKey] = [];
+            }
+            acc[dateKey].push(message);
+            return acc;
+        }, {});
+    };
+
+    formatDateSeparator = (dateString) => {
+        const date = new Date(dateString);
+        if (isToday(date)) {
+            return 'Today';
+        } else if (isYesterday(date)) {
+            return 'Yesterday';
+        } else {
+            return format(date, 'MMMM dd, yyyy');
+        }
+    };
+
     render() {
-        const { messages, newMessage, loading, user, email, password, otherUsersTyping, showModal, modalImageURL, imagePreviewURL, repliedMessage } = this.state;
-    
+        const { messages, newMessage, loading, user, email, password, imagePreviewURL, repliedMessage } = this.state;
+        const groupedMessages = this.groupMessagesByDate(messages);
+        const fileInputRef = React.createRef();
+
         return (
             <div className="app-container container">
                 <nav className="navbar">
@@ -239,82 +265,77 @@ class ChatApp extends React.Component {
                 <div className="chat-container" ref={this.chatContainerRef}>
                     {user && (
                         <div className="message-container">
-                            {messages.map((message, index) => (
-                                <div
-                                    key={index}
-                                    className={`message-bubble ${message.userId === user?.uid ? 'your-message' : 'other-user-message'}`}
-                                >
-                                    <span className="message-sender">{message.userId === user?.uid ? 'You' : message.senderEmail}: </span>
-                                    {message.text}
-                                    {message.imageBase64 && (
-                                        <div className="image-container">
-                                            <img src={message.imageBase64} alt="Shared" />
+                            {Object.keys(groupedMessages).map(dateKey => (
+                                <React.Fragment key={dateKey}>
+                                    <div className="date-separator">{this.formatDateSeparator(dateKey)}</div>
+                                    {groupedMessages[dateKey].map((message, index) => (
+                                        <div
+                                            key={index}
+                                            className={`message-bubble ${message.userId === user?.uid ? 'your-message' : 'other-user-message'}`}
+                                        >
+                                            <span className="message-sender">{message.userId === user?.uid ? 'You' : message.senderEmail}: </span>
+                                            {message.text}
+                                            {message.imageBase64 && (
+                                                <div className="image-container">
+                                                    <img src={message.imageBase64} alt="Shared" />
+                                                </div>
+                                            )}
+                                            <span className="message-time">{format(new Date(message.timestamp), 'hh:mm a')}</span>
                                         </div>
-                                    )}
-                                    {message.repliedMessage && (
-                                        <div className="replied-message">
-                                            <p>{message.repliedMessage.senderEmail}: {message.repliedMessage.text}</p>
-                                        </div>
-                                    )}
-                                    <span className="message-time">{new Date(message.timestamp).toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true })}</span>
-                                </div>
+                                    ))}
+                                </React.Fragment>
                             ))}
-                            {Object.keys(otherUsersTyping).map(userId => (
-                                userId !== user.uid && <div key={userId} className="typing-indicator">typing...</div>
-                            ))}
-                        </div>
-                    )}
-    
-                    {user ? (
-                        <form className="message-input" onSubmit={this.handleSubmit}>
-                            {repliedMessage && (
-                                <div className="replied-message-preview">
-                                    <p>{repliedMessage.senderEmail}: {repliedMessage.text}</p>
-                                    <button onClick={() => this.setState({ repliedMessage: null })}>Cancel Reply</button>
-                                </div>
-                            )}
-                            <input
-                                type="text"
-                                placeholder="Type your message..."
-                                value={newMessage}
-                                onChange={this.handleChange}
-                                disabled={loading}
-                            />
-                            <label htmlFor="file-upload" className="upload-button">@</label>
-                            <input
-                                id="file-upload"
-                                type="file"
-                                accept="image/*"
-                                onChange={this.handleImageChange}
-                            />
-                            {imagePreviewURL && (
-                                <div className="image-preview">
-                                    <img src={imagePreviewURL} alt="Preview" />
-                                </div>
-                            )}
-                            <button type="submit" disabled={loading}>Send</button>
-                        </form>
-                    ) : (
-                        <div className="login-container">
-                            <h2>Login</h2>
-                            <input
-                                type="email"
-                                placeholder="Email"
-                                value={email}
-                                onChange={(e) => this.setState({ email: e.target.value })}
-                            />
-                            <input
-                                type="password"
-                                placeholder="Password"
-                                value={password}
-                                onChange={(e) => this.setState({ password: e.target.value })}
-                            />
-                            <button onClick={this.handleEmailLogin}>Login</button>
                         </div>
                     )}
                 </div>
-                {showModal && (
-                    <Modal imageUrl={modalImageURL} onClose={() => this.setState({ showModal: false })} />
+
+                {user ? (
+                    <div className="input-container">
+                        {repliedMessage && (
+                            <div className="replied-message">
+                                <span>Replying to: {repliedMessage.text}</span>
+                                <button onClick={() => this.setState({ repliedMessage: null })}>Cancel</button>
+                            </div>
+                        )}
+                        <input
+                            type="text"
+                            value={newMessage}
+                            onChange={this.handleChange}
+                            placeholder="Type a message"
+                        />
+                        <input
+                            type="file"
+                            accept="image/*"
+                            onChange={this.handleImageChange}
+                            ref={fileInputRef}
+                            style={{ display: 'none' }}
+                        />
+                        <button onClick={() => fileInputRef.current.click()}>📷</button>
+                        <button onClick={this.handleSubmit} disabled={loading}>
+                            {loading ? 'Sending...' : 'Send'}
+                        </button>
+                        {imagePreviewURL && (
+                            <div className="image-preview">
+                                <img src={imagePreviewURL} alt="Preview" />
+                            </div>
+                        )}
+                    </div>
+                ) : (
+                    <div className="login-container">
+                        <input
+                            type="email"
+                            value={email}
+                            onChange={(e) => this.setState({ email: e.target.value })}
+                            placeholder="Email"
+                        />
+                        <input
+                            type="password"
+                            value={password}
+                            onChange={(e) => this.setState({ password: e.target.value })}
+                            placeholder="Password"
+                        />
+                        <button onClick={this.handleEmailLogin}>Login</button>
+                    </div>
                 )}
             </div>
         );
